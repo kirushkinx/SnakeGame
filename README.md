@@ -2,6 +2,8 @@
 
 Classic snake game rendered in Minecraft using text display entities.
 
+![Demo](./img/demo.gif)
+
 ## Requirements
 
 - Minecraft server 1.21.1+
