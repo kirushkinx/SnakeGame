@@ -77,6 +77,12 @@ public class SnakeGame {
         if (snake.getHead().equals(food.getPosition())) {
             snake.grow();
             score += 10;
+
+            if (snake.getBody().size() >= board.getWidth() * board.getHeight()) {
+                win();
+                return;
+            }
+
             food.spawn(snake);
             ate = true;
         }
