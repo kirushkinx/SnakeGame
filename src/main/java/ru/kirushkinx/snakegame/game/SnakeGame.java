@@ -1,6 +1,7 @@
 package ru.kirushkinx.snakegame.game;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import ru.kirushkinx.snakegame.SnakeGamePlugin;
@@ -8,7 +9,6 @@ import ru.kirushkinx.snakegame.display.CameraController;
 import ru.kirushkinx.snakegame.display.GameRenderer;
 import ru.kirushkinx.snakegame.game.entity.Food;
 import ru.kirushkinx.snakegame.game.entity.Snake;
-import ru.kirushkinx.snakegame.listener.protocol.PlayerMovementPacketListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,6 +79,9 @@ public class SnakeGame {
         if (snake.getHead().equals(food.getPosition())) {
             snake.grow();
             score += 10;
+            // play for camera location
+            player.playSound(cameraController.getCameraLocation(), Sound.ENTITY_PLAYER_BURP, 1.0f, 1.0f);
+
 
             if (snake.getBody().size() >= board.getWidth() * board.getHeight()) {
                 win();
@@ -94,6 +97,7 @@ public class SnakeGame {
 
     private void win() {
         isRunning = false;
+        player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
         player.sendMessage("§aYou Win! Score: " + score);
         stop();
     }
@@ -107,6 +111,7 @@ public class SnakeGame {
 
     private void gameOver() {
         isRunning = false;
+        player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 0.8f);
         player.sendMessage("§cGame Over! Score: " + score);
         stop();
     }
@@ -114,6 +119,7 @@ public class SnakeGame {
     public void stop() {
         if (isRunning) {
             isRunning = false;
+            player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_BREAK, 1.0f, 0.8f);
             player.sendMessage("§cGame Over! Score: " + score);
         }
 

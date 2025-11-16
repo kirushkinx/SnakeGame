@@ -64,4 +64,10 @@ public class CameraController {
             player.setGameMode(originalGameMode);
         }
     }
+
+    public Location getCameraLocation() {
+        return cameraEntity != null ? cameraEntity.getLocation() : player.getEyeLocation();
+    }
+
+
 }
