@@ -160,7 +160,7 @@ public class GameRenderer {
     }
 
     private void renderScore(int score) {
-        Location scoreLoc = renderLocation.clone().add(0, 2, 0);
+        Location scoreLoc = renderLocation.clone().add(0, 1, 0);
         com.github.retrooper.packetevents.protocol.world.Location peLocation =
                 SpigotConversionUtil.fromBukkitLocation(scoreLoc);
 
