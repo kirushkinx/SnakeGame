@@ -10,25 +10,25 @@ import ru.kirushkinx.snakegame.SnakeGamePlugin;
 import ru.kirushkinx.snakegame.game.Direction;
 import ru.kirushkinx.snakegame.game.SnakeGame;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PlayerMovementPacketListener extends PacketListenerAbstract {
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent e) {
-        if (e.getPacketType() == PacketType.Play.Client.PLAYER_INPUT) {
-            Player player = e.getPlayer();
+    public void onPacketReceive(PacketReceiveEvent event) {
+        if (event.getPacketType() == PacketType.Play.Client.PLAYER_INPUT) {
+            Player player = event.getPlayer();
             SnakeGame game = SnakeGame.getGame(player);
 
             if (game == null || !game.isRunning()) {
                 return;
             }
 
-            WrapperPlayClientPlayerInput wrapper = new WrapperPlayClientPlayerInput(e);
+            WrapperPlayClientPlayerInput wrapper = new WrapperPlayClientPlayerInput(event);
 
             if (wrapper.isShift()) {
-                Bukkit.getScheduler().runTask(SnakeGamePlugin.getInstance(), () -> {
-                    game.stop();
-                    player.sendMessage("§eYou left the game!");
-                });
+                Bukkit.getScheduler().runTask(SnakeGamePlugin.getInstance(), game::stop);
                 return;
             }
 
