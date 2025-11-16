@@ -1,4 +1,122 @@
 package ru.kirushkinx.snakegame.game;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+import ru.kirushkinx.snakegame.SnakeGamePlugin;
+import ru.kirushkinx.snakegame.display.CameraController;
+import ru.kirushkinx.snakegame.display.GameRenderer;
+import ru.kirushkinx.snakegame.game.entity.Food;
+import ru.kirushkinx.snakegame.game.entity.Snake;
+import ru.kirushkinx.snakegame.listener.protocol.PlayerMovementPacketListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class SnakeGame {
+
+    private static final Map<Player, SnakeGame> activeGames = new HashMap<>();
+
+    private final Player player;
+    private final GameBoard board;
+    private final Snake snake;
+    private final Food food;
+    private final GameRenderer renderer;
+    private final CameraController cameraController;
+
+    private BukkitTask gameTask;
+    private Direction currentDirection = Direction.LEFT;
+    private Direction nextDirection = Direction.LEFT;
+    private boolean isRunning = false;
+    private int score = 0;
+
+    public SnakeGame(Player player) {
+        this.player = player;
+        this.board = new GameBoard(20, 15);
+        this.snake = new Snake(board.getWidth() / 2, board.getHeight() / 2);
+        this.food = new Food(board);
+        this.renderer = new GameRenderer(player, board);
+        this.cameraController = new CameraController(player);
+
+        food.spawn(snake);
+    }
+
+    public void start() {
+        if (activeGames.containsKey(player)) {
+            activeGames.get(player).stop();
+        }
+
+        activeGames.put(player, this);
+        isRunning = true;
+
+        cameraController.moveToGameView();
+        renderer.initialize();
+        renderer.render(snake, food, score);
+
+        gameTask = Bukkit.getScheduler().runTaskTimer(SnakeGamePlugin.getInstance(),
+                this::tick, 20L, 10L);
+    }
+
+    private void tick() {
+        if (!isRunning) return;
+
+        currentDirection = nextDirection;
+
+        if (!snake.move(currentDirection, board)) {
+            gameOver();
+            return;
+        }
+
+        if (snake.checkCollision()) {
+            gameOver();
+            return;
+        }
+
+        boolean ate = false;
+        if (snake.getHead().equals(food.getPosition())) {
+            snake.grow();
+            score += 10;
+            food.spawn(snake);
+            ate = true;
+        }
+
+        renderer.render(snake, ate ? food : null, ate ? score : -1);
+    }
+
+    public void changeDirection(Direction direction) {
+        if (direction.isOpposite(currentDirection)) {
+            return;
+        }
+        this.nextDirection = direction;
+    }
+
+    private void gameOver() {
+        isRunning = false;
+        player.sendMessage("§cGame Over! Score: " + score);
+        stop();
+    }
+
+    public void stop() {
+        if (gameTask != null) {
+            gameTask.cancel();
+        }
+
+        renderer.cleanup();
+        cameraController.resetCamera();
+
+        activeGames.remove(player);
+    }
+
+    public static SnakeGame getGame(Player player) {
+        return activeGames.get(player);
+    }
+
+    public static void stopAllGames() {
+        new ArrayList<>(activeGames.values()).forEach(SnakeGame::stop);
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
 }

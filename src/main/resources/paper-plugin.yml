@@ -1,6 +1,12 @@
 name: SnakeGame
-version: '1.0.0'
-main: ru.kirushkinx.snakegame.SnakeGame
+version: ${version}
+main: ru.kirushkinx.snakegame.SnakeGamePlugin
 api-version: '1.21'
-authors: [ kirushkinx ]
-description: retro snake game
+author: kirushkinx
+description: Classic snake game inside a cubistic game :D
+dependencies:
+  server:
+    packetevents:
+      required: true
+      load: BEFORE
+      join-classpath: true

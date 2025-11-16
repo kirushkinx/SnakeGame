@@ -1,4 +1,6 @@
-package ru.kirushkinx.snakegame.game;
+package ru.kirushkinx.snakegame.game.entity;
+
+import ru.kirushkinx.snakegame.game.GameBoard;
 
 import java.util.Random;
 

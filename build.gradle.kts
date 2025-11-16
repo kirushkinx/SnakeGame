@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.3.0-Beta2"
-    id("com.gradleup.shadow") version "8.3.0"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    java
+    id("io.papermc.paperweight.userdev") version "1.7.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "ru.kirushkinx"
@@ -9,39 +9,41 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/") {
-        name = "papermc-repo"
-    }
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.codemc.io/repository/maven-public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT")
+
+    compileOnly("com.github.retrooper:packetevents-spigot:2.10.1")
+    implementation("com.github.Tofaa2.EntityLib:spigot:2.4.11")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
-    runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+    shadowJar {
+        archiveClassifier.set("")
     }
-}
 
-val targetJavaVersion = 21
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
+    assemble {
+        dependsOn(shadowJar)
+    }
 
-tasks.build {
-    dependsOn("shadowJar")
-}
+    build {
+        dependsOn(reobfJar)
+    }
 
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("paper-plugin.yml") {
-        expand(props)
+    processResources {
+        val props = mapOf("version" to version)
+        inputs.properties(props)
+        filteringCharset = "UTF-8"
+        filesMatching("paper-plugin.yml") {
+            expand(props)
+        }
     }
 }
