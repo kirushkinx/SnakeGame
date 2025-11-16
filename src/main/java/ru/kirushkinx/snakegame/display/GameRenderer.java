@@ -14,6 +14,7 @@ import ru.kirushkinx.snakegame.game.entity.Food;
 import ru.kirushkinx.snakegame.game.entity.Snake;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GameRenderer {
@@ -28,6 +29,7 @@ public class GameRenderer {
 
     private Snake.Position lastFoodPosition;
     private int lastScore = 0;
+    private int lastSnakeSize = 0;
 
     private static final double CELL_SIZE = 0.3;
     private static final double DISTANCE_FROM_CAMERA = 5.0;
@@ -71,14 +73,28 @@ public class GameRenderer {
     }
 
     public void render(Snake snake, Food food, int score) {
-        snakeDisplays.forEach(WrapperEntity::despawn);
-        snakeDisplays.clear();
+        LinkedList<Snake.Position> body = snake.getBody();
+        Snake.Position currentHead = body.getFirst();
+        int currentSize = body.size();
 
-        for (Snake.Position segment : snake.getBody()) {
-            spawnCell(segment.x, segment.y, "§a█", snakeDisplays);
+        if (lastSnakeSize == 0) {
+            for (Snake.Position segment : body) {
+                spawnCell(segment.x, segment.y, "§a█", snakeDisplays, false);
+            }
+            lastSnakeSize = currentSize;
+        } else {
+            boolean grewThisTick = currentSize > lastSnakeSize;
+
+            if (!grewThisTick && !snakeDisplays.isEmpty()) {
+                WrapperEntity tailDisplay = snakeDisplays.removeLast();
+                tailDisplay.despawn();
+            }
+
+            spawnCell(currentHead.x, currentHead.y, "§a█", snakeDisplays, true);
+            lastSnakeSize = currentSize;
         }
 
-        if (food != null) {
+        if (food != null && (lastFoodPosition == null || !lastFoodPosition.equals(food.getPosition()))) {
             foodDisplays.forEach(WrapperEntity::despawn);
             foodDisplays.clear();
 
@@ -98,7 +114,7 @@ public class GameRenderer {
         }
     }
 
-    private void spawnCell(int x, int y, String symbol, List<WrapperEntity> targetList) {
+    private void spawnCell(int x, int y, String symbol, List<WrapperEntity> targetList, boolean addToFront) {
         Location loc = renderLocation.clone().add(x * CELL_SIZE, -y * CELL_SIZE, 0);
         com.github.retrooper.packetevents.protocol.world.Location peLocation =
                 SpigotConversionUtil.fromBukkitLocation(loc);
@@ -113,7 +129,15 @@ public class GameRenderer {
         entity.spawn(peLocation);
         entity.addViewer(player.getUniqueId());
 
-        targetList.add(entity);
+        if (addToFront) {
+            targetList.add(0, entity);
+        } else {
+            targetList.add(entity);
+        }
+    }
+
+    private void spawnCell(int x, int y, String symbol, List<WrapperEntity> targetList) {
+        spawnCell(x, y, symbol, targetList, false);
     }
 
     private void spawnCellTransparent(int x, int y, String symbol, List<WrapperEntity> targetList) {

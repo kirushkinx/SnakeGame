@@ -9,7 +9,6 @@ import java.util.Objects;
 public class Snake {
 
     private final LinkedList<Position> body;
-    private boolean shouldGrow = false;
 
     public Snake(int startX, int startY) {
         body = new LinkedList<>();
@@ -30,12 +29,7 @@ public class Snake {
         }
 
         body.addFirst(newHead);
-
-        if (!shouldGrow) {
-            body.removeLast();
-        } else {
-            shouldGrow = false;
-        }
+        body.removeLast();
 
         return true;
     }
@@ -46,7 +40,8 @@ public class Snake {
     }
 
     public void grow() {
-        shouldGrow = true;
+        Position tail = body.getLast();
+        body.addLast(new Position(tail.x, tail.y));
     }
 
     public Position getHead() {
