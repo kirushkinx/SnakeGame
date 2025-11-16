@@ -84,6 +84,12 @@ public class SnakeGame {
         renderer.render(snake, ate ? food : null, ate ? score : -1);
     }
 
+    private void win() {
+        isRunning = false;
+        player.sendMessage("§aYou Win! Score: " + score);
+        stop();
+    }
+
     public void changeDirection(Direction direction) {
         if (direction.isOpposite(currentDirection)) {
             return;
