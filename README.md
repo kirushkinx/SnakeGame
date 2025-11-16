@@ -1,6 +1,6 @@
 # SnakeGame
 
-Classic snake game rendered in Minecraft using text display entities.
+Paper plugin that renders classic snake game in Minecraft using text display entities
 
 ![Demo](./img/demo.gif)
 
@@ -26,7 +26,7 @@ Start a game with `/snakegame` or `/snake`
 
 ## Configuration
 
-Currently hardcoded. Configuration system planned for future release.
+Currently hardcoded. Configuration system planned for future releases.
 
 ## License
 
