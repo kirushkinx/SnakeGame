@@ -54,6 +54,8 @@ public class SnakeGame {
         renderer.initialize();
         renderer.render(snake, food, score);
 
+        player.sendActionBar("§7Press §a§lShift §7to exit the game");
+
         gameTask = Bukkit.getScheduler().runTaskTimer(SnakeGamePlugin.getInstance(),
                 this::tick, 20L, 10L);
     }
