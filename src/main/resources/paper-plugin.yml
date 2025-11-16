@@ -1,0 +1,6 @@
+name: SnakeGame
+version: '1.0.0'
+main: ru.kirushkinx.snakegame.SnakeGame
+api-version: '1.21'
+authors: [ kirushkinx ]
+description: retro snake game
