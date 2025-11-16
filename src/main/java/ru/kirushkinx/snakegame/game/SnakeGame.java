@@ -98,6 +98,11 @@ public class SnakeGame {
     }
 
     public void stop() {
+        if (isRunning) {
+            isRunning = false;
+            player.sendMessage("§cGame Over! Score: " + score);
+        }
+
         if (gameTask != null) {
             gameTask.cancel();
         }
